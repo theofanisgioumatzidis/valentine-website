@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Will you be my Valentine? 💘</title>
+  <style>
+    :root{
+      --bg1:#fff1f6;
+      --bg2:#ffe4ef;
+      --card:#ffffffcc;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --yes:#16a34a;
+      --no:#ef4444;
+      --shadow: 0 20px 60px rgba(0,0,0,.12);
+      --radius: 22px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 15% 20%, var(--bg2), transparent 55%),
+        radial-gradient(900px 600px at 85% 80%, #ffd6e7, transparent 60%),
+        linear-gradient(180deg, var(--bg1), #fff);
+      overflow:hidden;
+    }
+
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background-image:
+        radial-gradient(circle at 20px 20px, #ff4d8d 9px, transparent 10px),
+        radial-gradient(circle at 60px 60px, #ff7aa8 10px, transparent 11px),
+        radial-gradient(circle at 100px 30px, #ff4d8d 7px, transparent 8px);
+      background-size: 140px 140px;
+      filter: blur(.3px);
+    }
+
+    .card{
+      width:min(680px, 92vw);
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.7);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding: 28px 24px 22px;
+      position:relative;
+    }
+
+    .title{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin: 6px 0 4px;
+      text-align:center;
+    }
+    .title h1{
+      margin:0;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -0.03em;
+    }
+    .subtitle{
+      text-align:center;
+      margin: 0 0 18px;
+      color:var(--muted);
+      font-size: clamp(14px, 2vw, 16px);
+    }
+
+    .stage{
+      position:relative;
+      height: 210px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.55);
+      border: 1px dashed rgba(255,77,141,.35);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+
+    .buttons{
+      position:relative;
+      width:100%;
+      height:100%;
+    }
+
+    button{
+      border:0;
+      font-weight:700;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font-size: 16px;
+      cursor:pointer;
+      box-shadow: 0 10px 24px rgba(0,0,0,.12);
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    button:active{ transform: translateY(1px) scale(.99); }
+    button:focus{ outline: 3px solid rgba(255,77,141,.35); outline-offset:3px; }
+
+    #yesBtn{
+      background: linear-gradient(180deg, #22c55e, var(--yes));
+      color:white;
+      position:absolute;
+      left: 50%;
+      top: 58%;
+      transform: translate(-120%, -50%);
+    }
+    #yesBtn:hover{ filter: brightness(1.03); }
+
+    #noBtn{
+      background: linear-gradient(180deg, #ff6b6b, var(--no));
+      color:white;
+      position:absolute;
+      left: 50%;
+      top: 58%;
+      transform: translate(20%, -50%);
+    }
+
+    .hint{
+      margin-top: 14px;
+      text-align:center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      background: rgba(17,24,39,.45);
+      padding: 18px;
+    }
+    .modal.open{ display:grid; }
+    .modalCard{
+      width:min(620px, 94vw);
+      background:white;
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 26px 22px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .modalCard::before{
+      content:"";
+      position:absolute;
+      inset:-60px -60px auto auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle at 30% 30%, #ff4d8d, transparent 60%);
+      opacity:.25;
+      transform: rotate(15deg);
+    }
+    .big{
+      font-size: clamp(26px, 4vw, 40px);
+      margin: 0 0 6px;
+      letter-spacing:-0.02em;
+    }
+    .msg{
+      margin: 0 auto 16px;
+      max-width: 44ch;
+      color: #374151;
+      line-height: 1.4;
+    }
+    .row{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .secondary{
+      background:#111827;
+      color:white;
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+    }
+    .ghost{
+      background: transparent;
+      color:#111827;
+      border: 1px solid rgba(17,24,39,.2);
+      box-shadow:none;
+    }
+
+    /* floating heart burst */
+    .burst{
+      position:absolute;
+      left: var(--x);
+      top: var(--y);
+      transform: translate(-50%, -50%);
+      font-size: 22px;
+      animation: pop 900ms ease forwards;
+      pointer-events:none;
+    }
+    @keyframes pop{
+      0%{ opacity:0; transform: translate(-50%, -50%) scale(.5); }
+      15%{ opacity:1; transform: translate(-50%, -60%) scale(1.1); }
+      100%{ opacity:0; transform: translate(-50%, -140%) scale(1.4); }
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts"></div>
+
+  <main class="card" aria-live="polite">
+    <div class="title">
+      <h1>Will you be my Valentine? 💘</h1>
+    </div>
+    <p class="subtitle">Choose wisely. (You *can* try “No”… if you can catch it.)</p>
+
+    <section class="stage" id="stage">
+      <div class="buttons" id="buttons">
+        <button id="yesBtn" type="button">Yes 💖</button>
+        <button id="noBtn" type="button">No 🙃</button>
+      </div>
+    </section>
+
+    <p class="hint" id="hint">Tip: If you're on mobile, try tapping “No”.</p>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Valentine response">
+    <div class="modalCard">
+      <h2 class="big">Yay! 🥰</h2>
+      <p class="msg" id="finalMsg">
+        You just made my day. I have a surprise for you 💝
+      </p>
+      <div class="row">
+        <button class="secondary" id="confettiBtn" type="button">More hearts</button>
+        <button class="ghost" id="closeBtn" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const buttons = document.getElementById('buttons');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn  = document.getElementById('noBtn');
+
+    const modal = document.getElementById('modal');
+    const closeBtn = document.getElementById('closeBtn');
+    const confettiBtn = document.getElementById('confettiBtn');
+
+    let noDodges = 0;
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function moveNoButton() {
+      const stageRect = stage.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // Random position inside stage, keeping button fully visible
+      const pad = 10;
+      const maxX = stageRect.width - btnRect.width - pad;
+      const maxY = stageRect.height - btnRect.height - pad;
+
+      const x = Math.random() * maxX + pad;
+      const y = Math.random() * maxY + pad;
+
+      // Position relative to .buttons container
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
+      noBtn.style.transform = `translate(0,0)`;
+
+      noDodges++;
+      if (noDodges === 3) {
+        document.getElementById('hint').textContent = "Ok ok… just press “Yes” 😄";
+      } else if (noDodges === 6) {
+        document.getElementById('hint').textContent = "You’re really committed to “No”, huh? 😂";
+      }
+    }
+
+    // Make "No" dodge when cursor gets close (desktop)
+    noBtn.addEventListener('mouseenter', moveNoButton);
+
+    // Also dodge on touch attempts (mobile)
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+
+    // And if somehow clicked, still dodge
+    noBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    function heartBurst(clientX, clientY, count = 10) {
+      const rect = document.body.getBoundingClientRect();
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('div');
+        s.className = 'burst';
+        s.textContent = Math.random() > 0.5 ? '💖' : '💘';
+        const jitterX = (Math.random() - 0.5) * 80;
+        const jitterY = (Math.random() - 0.5) * 40;
+        s.style.setProperty('--x', `${clientX + jitterX - rect.left}px`);
+        s.style.setProperty('--y', `${clientY + jitterY - rect.top}px`);
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 900);
+      }
+    }
+
+    yesBtn.addEventListener('click', (e) => {
+      modal.classList.add('open');
+      heartBurst(e.clientX, e.clientY, 14);
+    });
+
+    confettiBtn.addEventListener('click', (e) => {
+      const x = window.innerWidth / 2;
+      const y = window.innerHeight / 2;
+      heartBurst(x, y, 18);
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('open');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+
+    // On load, make sure No button is "catchable" initially for a moment
+    // then start dodging only on interaction.
+  </script>
+</body>
+</html>
